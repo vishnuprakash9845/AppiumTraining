@@ -2,6 +2,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Android;
+using OpenQA.Selenium.Appium.MultiTouch;
 using OpenQA.Selenium.Chrome;
 using System;
 using System.Collections.Generic;
@@ -165,7 +166,6 @@ namespace MobAutomation
             driver.FindElementByXPath("(//*[@resource-id='android:id/numberpicker_input'])[2]").Click();
             driver.FindElementByXPath("(//*[@resource-id='android:id/numberpicker_input'])[2]").Clear();
             driver.FindElementByXPath("(//*[@resource-id='android:id/numberpicker_input'])[2]").SendKeys("02");
-            //driver.FindElementByXPath("//*[@text='OK']").Click();
 
             driver.FindElementByXPath("(//*[@resource-id='android:id/numberpicker_input'])[3]").Click();
             driver.FindElementByXPath("(//*[@resource-id='android:id/numberpicker_input'])[3]").Clear();
@@ -176,5 +176,66 @@ namespace MobAutomation
 
             driver.Quit();
         }
+
+        [TestMethod]
+        public void KhanSwipeTest()
+        {
+            Console.WriteLine("Native App Automation");
+
+            AppiumOptions option = new AppiumOptions();
+            option.AddAdditionalCapability("platformName", "android");
+            option.AddAdditionalCapability("deviceName", "mototrola one");
+            option.AddAdditionalCapability("appActivity", "org.khanacademy.android.ui.library.MainActivity");
+            option.AddAdditionalCapability("appPackage", "org.khanacademy.android");
+            option.AddAdditionalCapability("noReset", true);
+
+            AndroidDriver<IWebElement> driver = new AndroidDriver<IWebElement>(new Uri("http://127.0.0.1:4723/wd/hub"), option);
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+
+            //Search
+            driver.FindElementById("org.khanacademy.android:id/tab_bar_button_search").Click();
+
+            //Option Arts and humanities
+            //driver.FindElementByXPath("//android.widget.TextView[@text='Arts and humanities']").Click();
+            driver.FindElementByAndroidUIAutomator("UiSelector().textContains(\"Arts and humanities\")").Click();
+
+            //Scroll-1
+            ScrollToElementAndClick(driver, "Art of Asia");
+
+            //driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(0);
+            //while (driver.FindElementsByAndroidUIAutomator("UiSelector().textContains(\"Art of Asia\")").Count==0)
+            //{
+            //    TouchAction action = new TouchAction(driver);
+            //    action.Press(349, 1015).Wait(1000).MoveTo(349,400).Release().Perform();
+            //}
+
+            //driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            //driver.FindElementByAndroidUIAutomator("UiSelector().textContains(\"Art of Asia\")").Click();
+
+            //Scroll-2
+            ScrollToElementAndClick(driver, "Himalayas");
+
+            //Scroll-3 : Click on Cabinet for strong offering
+            ScrollToElementAndClick(driver, "Cabinet for storing offerings");
+
+            driver.Quit();
+        }
+
+        #region Generic Method
+
+        public void ScrollToElementAndClick(AndroidDriver<IWebElement> driver, string fieldName)
+        {
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(0);
+            while (driver.FindElementsByAndroidUIAutomator($"UiSelector().textContains(\"{fieldName}\")").Count == 0)
+            {
+                TouchAction action = new TouchAction(driver);
+                action.Press(349, 1015).Wait(1000).MoveTo(349, 400).Release().Perform();
+            }
+
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            driver.FindElementByAndroidUIAutomator($"UiSelector().textContains(\"{fieldName}\")").Click();
+        }
+
+        #endregion
     }
 }
